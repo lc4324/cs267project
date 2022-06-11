@@ -1,7 +1,12 @@
 import importlib
 from dgl.data import DGLDataset
 from .base_dataset import BaseDataset
-from .adapter import AsNodeClassificationDataset
+from .utils import load_acm, load_acm_raw, generate_random_hg
+from .academic_graph import AcademicDataset
+from .hgb_dataset import HGBDataset
+from .ohgb_dataset import OHGBDataset
+from .gtn_dataset import *
+from .adapter import AsLinkPredictionDataset, AsNodeClassificationDataset
 
 DATASET_REGISTRY = {}
 
@@ -48,16 +53,44 @@ def build_dataset(dataset, task, *args, **kwargs):
         return build_dataset_v2(dataset, task)
     if not try_import_task_dataset(task):
         exit(1)
-    _dataset = 'rdf_' + task
-    
+    if dataset in ['aifb', 'mutag', 'bgs', 'am']:
+        _dataset = 'rdf_' + task
+    if dataset == 'fma':
+        _dataset = 'fma_node_classification'
+    elif dataset in ['acm4NSHE', 'acm4GTN', 'academic4HetGNN', 'acm_han', 'acm_han_raw', 'acm4HeCo', 'dblp', 'dblp4MAGNN',
+                     'imdb4MAGNN', 'imdb4GTN', 'acm4NARS', 'demo_graph', 'yelp4HeGAN', 'DoubanMovie', 'Book-Crossing',
+                     'amazon4SLICE', 'MTWM', 'HNE-PubMed', 'HGBl-ACM', 'HGBl-DBLP', 'HGBl-IMDB']:
+        _dataset = 'hin_' + task
+    elif dataset in ['ohgbl-MTWM', 'ohgbl-yelp1', 'ohgbl-yelp2', 'ohgbl-Freebase',
+                     'ohgbn-Freebase', 'ohgbn-yelp2', 'ohgbn-acm', 'ohgbn-imdb']:
+        _dataset = 'ohgb_' + task
+    elif dataset in ['ogbn-mag']:
+        _dataset = 'ogbn_' + task
+    elif dataset in ['HGBn-ACM', 'HGBn-DBLP', 'HGBn-Freebase', 'HGBn-IMDB']:
+        _dataset = 'HGBn_node_classification'
+    elif dataset in ['HGBl-amazon', 'HGBl-LastFM', 'HGBl-PubMed']:
+        _dataset = 'HGBl_link_prediction'
+    elif dataset in ['wn18', 'FB15k', 'FB15k-237']:
+        assert task == 'link_prediction'
+        _dataset = 'kg_link_prediction'
+    elif dataset in ['LastFM4KGCN']:
+        _dataset = 'kgcn_recommendation'
+    elif dataset in ['yelp4rec']:
+        _dataset = 'hin_' + task
+    elif dataset == 'demo':
+        _dataset = 'demo_' + task
     return DATASET_REGISTRY[_dataset](dataset, logger=kwargs['logger'])
 
 
 SUPPORTED_DATASETS = {
     "node_classification": "openhgnn.dataset.NodeClassificationDataset",
+    "link_prediction": "openhgnn.dataset.LinkPredictionDataset",
+    "recommendation": "openhgnn.dataset.RecommendationDataset"
 }
 
 from .NodeClassificationDataset import NodeClassificationDataset
+from .LinkPredictionDataset import LinkPredictionDataset
+from .RecommendationDataset import RecommendationDataset
 
 
 def build_dataset_v2(dataset, task):
@@ -72,6 +105,10 @@ def build_dataset_v2(dataset, task):
             if target_ntype is None:
                 target_ntype = getattr(d, 'target_ntype')
             res = AsNodeClassificationDataset(d, target_ntype=target_ntype)
+        elif task == 'link_prediction':
+            target_link = getattr(d, 'target_link')
+            target_link_r = getattr(d, 'target_link_r')
+            res = AsLinkPredictionDataset(d, target_link=target_link, target_link_r=target_link_r)
         return res
 
 
@@ -84,6 +121,15 @@ CLASS_DATASETS = {
 __all__ = [
     'BaseDataset',
     'NodeClassificationDataset',
+    'LinkPredictionDataset',
+    'RecommendationDataset',
+    'AcademicDataset',
+    'HGBDataset',
+    'OHGBDataset',
+    'IMDB4GTNDataset',
+    'ACM4GTNDataset',
+    'DBLP4GTNDataset',
+    'AsLinkPredictionDataset',
     'AsNodeClassificationDataset'
 ]
 
