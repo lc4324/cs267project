@@ -1,6 +1,7 @@
 BEST_CONFIGS = {
     "node_classification": {
         'RGCN': {
+            'fma': {'max_epoch': 500, 'lr': 0.005, 'hidden_dim': 32, 'num_heads': 2, 'dropout': 0.3781807209525764, 'n_layers': 2, 'evaluation_metric': 'f1'},
             'general': {
                 'seed': 0, 'patience': 40, 'validation': True, 'evaluation_metric': 'acc'
             },
