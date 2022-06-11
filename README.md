@@ -13,4 +13,10 @@ Note: learning and inference are computationally intractable for large dataset. 
 
 main.py and hgnn:
 Code for RGCN. To run hyperparameter search ```python main.py -m RGCN -t node_classification -d fma -g 0 --use_hpo```. To run with the best hyperparameters we found ```python main.py -m RGCN -t node_classification -d fma -g 0 --use_best_config```
+
+BN_model.py: Require dependency on PyTAC libray
+
+gen_BN_from_dataset(CSV_PATH, DATA_SIZE): generate complete bayesian network from dataset, but learning is intractable
+train_toy_BN_from_dataset(): make simple BN baseline and learn from dataset
+
 .
